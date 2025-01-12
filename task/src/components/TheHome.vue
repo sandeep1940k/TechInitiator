@@ -27,13 +27,14 @@ const debounceSearch = debounce(() => {
 const handleImageError = (id) => {
     schoolList.value.forEach((school) => {
         if (school.id === id) {
-            school.logo = null; 
+            school.logo = null;
         }
     });
 };
 
 
-watch(search, debounceSearch);
+watch(search, debounceSearch, { immediate: false });
+
 
 onMounted(async () => {
     await getSchoolList();
@@ -42,7 +43,12 @@ onMounted(async () => {
 
 <template>
     <div>
-        <img src="../assets/images/banner.png" alt="Banner" loading="lazy" width="100%" height="auto">
+        <picture>
+            <source srcset="../assets/images/banner.png" media="(max-width: 600px)">
+            <img src="../assets/images/banner.png" alt="Banner" loading="lazy" width="1200" height="600" class="banner">
+        </picture>
+
+        <!-- <img src="../assets/images/banner.png" alt="Banner" loading="lazy" width="100%" height="auto"> -->
     </div>
     <div class="container">
         <div class="text-center mt-4">
@@ -55,7 +61,7 @@ onMounted(async () => {
             </div>
 
             <div class="player mt-4">
-                <img src="../assets/images/player.png" alt="Player" loading="lazy" width="100%" height="auto">
+                <img src="../assets/images/player.png" alt="Player" loading="lazy" width="100%" height="auto" class="player-img">
             </div>
 
             <div class="challenge card">
@@ -75,7 +81,7 @@ onMounted(async () => {
                     <div class="search mb-2">
                         <input type="text" placeholder="Search campaign here" class="form-control" v-model="search">
                     </div>
-                    <div v-if="isLoading" class="loader-container" style="height: 100px;">
+                    <div v-if="isLoading" class="school-skeleton" style="height: 100px;">
                         <div class="loader"></div>
                     </div>
                     <div v-else class="main-school-list">
@@ -108,6 +114,20 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 2;
+    /* Example ratio */
+}
+.banner{
+    aspect-ratio: 12/2;
+}
+.player-img{
+    aspect-ratio: 2.5/2;
+}
+
 .section-loader {
     position: absolute;
     top: 0;
@@ -132,20 +152,28 @@ onMounted(async () => {
     animation: spin 1s linear infinite;
 }
 
-.loader-container {
+.school-skeleton {
     display: flex;
     justify-content: center;
+    min-height: 60px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    animation: pulse 1.5s infinite;
 }
 
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
+@keyframes pulse {
 
+    0%,
     100% {
-        transform: rotate(360deg);
+        background-color: #f0f0f0;
+    }
+
+    50% {
+        background-color: #e0e0e0;
     }
 }
+
 
 img {
     width: 100%;
@@ -236,6 +264,7 @@ button:hover {
     max-width: 160px;
     width: 100%;
     transition: transform 0.3s ease;
+    aspect-ratio: 2.5;
 }
 
 .store-buttons img:hover {
@@ -328,7 +357,7 @@ button:hover {
     width: 100%;
     overflow-y: auto;
     max-height: 220px;
-    min-height: 220px; 
+    min-height: 220px;
     scrollbar-width: thin;
     scrollbar-color: #c0c0c0 #f0f0f0;
     margin-bottom: 40px;
@@ -350,6 +379,9 @@ button:hover {
 }
 
 .join-icon-placeholder {
+    width: 40px;
+    height: 40px;
+    aspect-ratio: 1 / 1;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -360,16 +392,17 @@ button:hover {
     color: black;
 }
 
-.loader-container {
+
+/* .loader-container {
     display: flex;
     justify-content: center;
-}
+} */
 
 .main-school-list {
     width: 100%;
     overflow-y: auto;
     max-height: 220px;
-    min-height: 220px; 
+    min-height: 220px;
     scrollbar-width: thin;
     scrollbar-color: #c0c0c0 #f0f0f0;
     margin-bottom: 40px;
@@ -386,7 +419,8 @@ button:hover {
 .main-school-list::-webkit-scrollbar-thumb {
     background-color: #c0c0c0;
 }
-.no-campaign-found{
+
+.no-campaign-found {
     color: black;
 }
 
@@ -432,8 +466,16 @@ button:hover {
     }
 
     .school-campaign {
-        width: 90%;
+        min-height: 60px;
+        /* Ensure consistent height */
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px;
+        background: #ececec;
+        border-radius: 5px;
     }
+
 
     .signup-text {
         font-size: 0.8rem;
@@ -443,10 +485,9 @@ button:hover {
     .join-icon-placeholder {
         margin-right: 0px;
     }
-    .campaign-detail{
+
+    .campaign-detail {
         width: 60%;
     }
 }
-
 </style>
-
