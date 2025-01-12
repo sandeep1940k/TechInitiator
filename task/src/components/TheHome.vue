@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 import axios from 'axios';
-import debounce from 'lodash.debounce';
+import debounce from 'lodash/debounce';
 
 const schoolList = ref([]);
 const isLoading = ref(false);
@@ -10,7 +10,9 @@ const search = ref('');
 const getSchoolList = async () => {
     try {
         isLoading.value = true;
-        const response = await axios.get(`https://api.devharlemwizardsinabox.com/campaign/campaign_school_list/?search=${search.value}`);
+        const response = await axios.get(`https://api.devharlemwizardsinabox.com/campaign/campaign_school_list/`, {
+            params: { search: search.value },
+        });
         schoolList.value = response.data.school_list;
     } catch (error) {
         console.error('Error fetching school list:', error);
@@ -18,6 +20,7 @@ const getSchoolList = async () => {
         isLoading.value = false;
     }
 };
+
 
 
 const debounceSearch = debounce(() => {
@@ -61,7 +64,11 @@ onMounted(async () => {
             </div>
 
             <div class="player mt-4">
-                <img src="../assets/images/player.png" alt="Player" loading="lazy" width="100%" height="auto" class="player-img">
+                <picture>
+                    <source srcset="../assets/images/player.png" media="(max-width: 600px)">
+                    <img src="../assets/images/player.png" alt="Player" loading="lazy" width="100%" height="auto" class="player-img">
+                </picture>
+                <!-- <img src="../assets/images/player.png" alt="Player" loading="lazy" width="100%" height="auto" class="player-img"> -->
             </div>
 
             <div class="challenge card">
@@ -82,7 +89,7 @@ onMounted(async () => {
                         <input type="text" placeholder="Search campaign here" class="form-control" v-model="search">
                     </div>
                     <div v-if="isLoading" class="school-skeleton" style="height: 100px;">
-                        <div class="loader"></div>
+                        <!-- <div class="loader"></div> -->
                     </div>
                     <div v-else class="main-school-list">
                         <template v-if="schoolList.length">
@@ -121,10 +128,21 @@ img {
     aspect-ratio: 3 / 2;
     /* Example ratio */
 }
-.banner{
+
+body {
+    font-family: 'Egyptian', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+
+.banner {
+    width: 100%;
+    height: auto;
     aspect-ratio: 12/2;
 }
-.player-img{
+
+.player-img {
     aspect-ratio: 2.5/2;
 }
 
@@ -230,7 +248,7 @@ button:hover {
 
 .challenge-download {
     color: black;
-    font-size: 1rem;
+    font-size: 0.8rem;
     margin: 0;
     font-weight: 600;
 }
@@ -246,7 +264,7 @@ button:hover {
 
 .signup-text {
     color: black;
-    font-size: 1rem;
+    font-size: 0.8rem;
     margin: 6px 10px;
     font-weight: 600;
 }

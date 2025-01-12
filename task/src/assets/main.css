@@ -12,12 +12,17 @@ body {
 @font-face {
   font-family: 'Egyptian';
   src: url('../assets/fonts/EgyptianSlateBd.TTF') format('truetype');
-  font-weight: 800; /* Corresponds to Extra Bold */
+  font-weight: 800; 
   font-style: normal;
+  font-display: swap;
+
 }
 @font-face {
   font-family: 'RoadRange';
   src: url('../assets/fonts/RoadRage Rob.ttf') format('truetype');
-  font-weight: 800; /* Corresponds to Extra Bold */
+  font-weight: 800; 
   font-style: normal;
+  font-display: swap;
+
 }
+
