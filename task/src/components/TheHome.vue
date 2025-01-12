@@ -386,6 +386,9 @@ button:hover {
 .main-school-list::-webkit-scrollbar-thumb {
     background-color: #c0c0c0;
 }
+.no-campaign-found{
+    color: black;
+}
 
 /* responsive */
 @media (max-width: 1400px) {
