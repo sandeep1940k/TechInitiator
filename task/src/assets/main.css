@@ -1,0 +1,23 @@
+
+:root{
+  --text-color: rgb(216, 1, 90);
+}
+
+body {
+  background-color: white;
+  margin: 0;
+  padding: 0;
+}
+
+@font-face {
+  font-family: 'Egyptian';
+  src: url('../assets/fonts/EgyptianSlateBd.TTF') format('truetype');
+  font-weight: 800; /* Corresponds to Extra Bold */
+  font-style: normal;
+}
+@font-face {
+  font-family: 'RoadRange';
+  src: url('../assets/fonts/RoadRage Rob.ttf') format('truetype');
+  font-weight: 800; /* Corresponds to Extra Bold */
+  font-style: normal;
+}
