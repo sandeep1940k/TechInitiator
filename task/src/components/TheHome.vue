@@ -1,19 +1,17 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import axios from 'axios';
+import debounce from 'lodash.debounce';
 
 const schoolList = ref([]);
-const schools = ref([]);
 const isLoading = ref(false);
-const search = ref(null);
+const search = ref('');
 
 const getSchoolList = async () => {
     try {
         isLoading.value = true;
-        const response = await axios.get('https://api.devharlemwizardsinabox.com/campaign/campaign_school_list/?search=');
+        const response = await axios.get(`https://api.devharlemwizardsinabox.com/campaign/campaign_school_list/?search=${search.value}`);
         schoolList.value = response.data.school_list;
-        schools.value = response.data.school_list;
-        isLoading.value = false;
     } catch (error) {
         console.error('Error fetching school list:', error);
     } finally {
@@ -21,33 +19,30 @@ const getSchoolList = async () => {
     }
 };
 
+
+const debounceSearch = debounce(() => {
+    getSchoolList();
+}, 300);
+
 const handleImageError = (id) => {
-    schoolList.value.map((school) => {
+    schoolList.value.forEach((school) => {
         if (school.id === id) {
-            school.logo = null;
+            school.logo = null; 
         }
-    })
+    });
 };
 
-const handleSearch = () => {
-    if (search.value !== '') {
-        schoolList.value = schools.value.filter((school) =>
-            school.school_name.toLowerCase().includes(search.value.toLowerCase())
-        );
-    } else {
-        schoolList.value = schools.value
-    }
-};
+
+watch(search, debounceSearch);
 
 onMounted(async () => {
     await getSchoolList();
 });
-
 </script>
 
 <template>
     <div>
-        <img src="../assets/images/banner.png" alt="Banner" loading="lazy">
+        <img src="../assets/images/banner.png" alt="Banner" loading="lazy" width="100%" height="auto">
     </div>
     <div class="container">
         <div class="text-center mt-4">
@@ -60,15 +55,15 @@ onMounted(async () => {
             </div>
 
             <div class="player mt-4">
-                <img src="../assets/images/player.png" alt="Player" loading="lazy">
+                <img src="../assets/images/player.png" alt="Player" loading="lazy" width="100%" height="auto">
             </div>
 
             <div class="challenge card">
                 <p class="challenge-text">Are you ready to take the challenge?</p>
                 <p class="challenge-download">Download Harlem Wizards App</p>
                 <div class="store-buttons d-flex justify-content-center gap-3">
-                    <img src="../assets/images/google-store.png" alt="Google Play Store" class="store-icon" loading="lazy">
-                    <img src="../assets/images/apple-store.png" alt="Apple App Store" class="store-icon" loading="lazy">
+                    <img src="../assets/images/google-store.png" alt="Google Play Store" class="store-icon" loading="lazy" width="160" height="auto">
+                    <img src="../assets/images/apple-store.png" alt="Apple App Store" class="store-icon" loading="lazy" width="160" height="auto">
                 </div>
                 <div class="store-text d-flex">
                     <hr>
@@ -78,21 +73,21 @@ onMounted(async () => {
 
                 <div class="signup-form mt-2">
                     <div class="search mb-2">
-                        <input type="text" placeholder="Search campaign here" class="form-control" v-model="search" @input="handleSearch">
+                        <input type="text" placeholder="Search campaign here" class="form-control" v-model="search">
                     </div>
-                    <div v-if="isLoading" class="loader-container">
+                    <div v-if="isLoading" class="loader-container" style="height: 100px;">
                         <div class="loader"></div>
                     </div>
                     <div v-else class="main-school-list">
                         <template v-if="schoolList.length">
                             <div v-for="(school, index) in schoolList" :key="school.id" class="join-campaign mt-2">
                                 <div class="school-campaign">
-                                    <div class="d-flex align-items-center">
+                                    <div class="campaign-detail d-flex align-items-center">
                                         <template v-if="school.logo">
-                                            <img :src="school.logo" alt="School Logo" class="join-icon" loading="lazy" @error="handleImageError(school.id)">
+                                            <img :src="school.logo" alt="School Logo" class="join-icon" loading="lazy" @error="handleImageError(school.id)" width="40" height="40">
                                         </template>
                                         <template v-else>
-                                            <div class="join-icon-placeholder">
+                                            <div class="join-icon-placeholder" :style="{ width: '40px', height: '40px' }">
                                                 {{ school.school_name.charAt(0) }}
                                             </div>
                                         </template>
@@ -111,7 +106,6 @@ onMounted(async () => {
         </div>
     </div>
 </template>
-
 
 <style scoped>
 .section-loader {
@@ -138,7 +132,7 @@ onMounted(async () => {
     animation: spin 1s linear infinite;
 }
 
-.loader-container{
+.loader-container {
     display: flex;
     justify-content: center;
 }
@@ -159,13 +153,13 @@ img {
 
 .custom-heading {
     font-family: 'Egyptian';
-    font-size: 1.5rem;
+    font-size: 3.5rem;
     font-weight: 700;
     color: var(--text-color);
 }
 
 .container {
-    padding: 1rem;
+    padding: 1rem 10rem;
 }
 
 button {
@@ -179,6 +173,7 @@ button {
     gap: 0.5rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: background-color 0.3s ease;
+    font-size: 2.5rem;
 }
 
 button i {
@@ -188,11 +183,10 @@ button i {
 
 button:hover {
     background-color: var(--text-color);
-    /* color: #fff; */
 }
 
 .player {
-    max-width: 280px;
+    max-width: 470px;
     width: 100%;
     margin: 0 auto;
     text-align: center;
@@ -202,14 +196,13 @@ button:hover {
 .challenge {
     margin: -1px auto;
     text-align: center;
-    width: 600px;
     box-shadow: 2px 2px 2px;
     color: #d7d7d7;
 }
 
 .challenge-download {
     color: black;
-    font-size: 0.6rem;
+    font-size: 1rem;
     margin: 0;
     font-weight: 600;
 }
@@ -225,13 +218,13 @@ button:hover {
 
 .signup-text {
     color: black;
-    font-size: 0.5rem;
-    margin: 6px 0px;
+    font-size: 1rem;
+    margin: 6px 10px;
     font-weight: 600;
 }
 
 .challenge-text {
-    font-size: 2rem;
+    font-size: 3.5rem;
     font-weight: 500;
     color: var(--text-color);
     margin: 0.5rem 0;
@@ -240,7 +233,7 @@ button:hover {
 }
 
 .store-buttons img {
-    max-width: 90px;
+    max-width: 160px;
     width: 100%;
     transition: transform 0.3s ease;
 }
@@ -260,18 +253,16 @@ button:hover {
     justify-content: center;
 }
 
-
 .signup-form {
     text-align: center;
-
 }
 
 .form-control {
     border-radius: 10px;
-    font-size: 10px;
+    font-size: 12px;
     padding-left: 30px;
-    height: 30px;
-    width: 50%;
+    height: 40px;
+    width: 52%;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -282,7 +273,7 @@ button:hover {
 }
 
 .school-campaign {
-    width: 50%;
+    width: 52%;
     background: #ececec;
     display: flex;
     border-radius: 5px;
@@ -292,15 +283,15 @@ button:hover {
 
 .school-campaign img {
     border-radius: 50%;
-    width: 26px;
-    height: 26px;
+    width: 40px;
+    height: 40px;
 }
 
 .school-campaign p {
     margin: 0;
     padding: 0;
     color: black;
-    font-size: 10px;
+    font-size: 0.9rem;
     text-transform: capitalize;
     font-weight: 600;
     padding: 0 10px;
@@ -314,7 +305,6 @@ button:hover {
     align-items: center;
     justify-content: center;
     gap: 1rem;
-    margin-left: 10px;
 }
 
 .join-icon {
@@ -328,10 +318,9 @@ button:hover {
     color: var(--text-color);
     border: none;
     border-radius: 5px;
-    font-size: 1rem;
+    font-size: 0.9rem;
     transition: background-color 0.3s ease;
     justify-content: space-between;
-    font-size: 9px;
     border: 1px solid;
 }
 
@@ -339,7 +328,7 @@ button:hover {
     width: 100%;
     overflow-y: auto;
     max-height: 220px;
-
+    min-height: 220px; 
     scrollbar-width: thin;
     scrollbar-color: #c0c0c0 #f0f0f0;
     margin-bottom: 40px;
@@ -360,29 +349,101 @@ button:hover {
     border: 2px solid #f0f0f0;
 }
 
-.main-school-list::-webkit-scrollbar-thumb:hover {
-    background-color: #a0a0a0;
-}
-
 .join-icon-placeholder {
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    background-color: #ccc;
     display: flex;
-    align-items: center;
     justify-content: center;
-    margin-right: 10px;
+    align-items: center;
+    font-size: 1.5rem;
     font-weight: bold;
-    color: white;
-    font-size: 18px;
+    background-color: #fff;
+    border-radius: 50%;
+    color: black;
 }
 
-.no-campaign-found {
-    text-align: center;
-    color: #888;
-    font-size: 1.2rem;
-    font-weight: 500;
-    margin-top: 20px;
+.loader-container {
+    display: flex;
+    justify-content: center;
 }
+
+.main-school-list {
+    width: 100%;
+    overflow-y: auto;
+    max-height: 220px;
+    min-height: 220px; 
+    scrollbar-width: thin;
+    scrollbar-color: #c0c0c0 #f0f0f0;
+    margin-bottom: 40px;
+}
+
+.main-school-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.main-school-list::-webkit-scrollbar-track {
+    background: #f0f0f0;
+}
+
+.main-school-list::-webkit-scrollbar-thumb {
+    background-color: #c0c0c0;
+}
+
+/* responsive */
+@media (max-width: 1400px) {
+    .container {
+        padding: 1rem 4rem;
+    }
+}
+
+@media (max-width: 1200px) {
+    .custom-heading {
+        font-size: 2.5rem;
+    }
+
+    button {
+        font-size: 1.2rem;
+    }
+
+    .challenge-text {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 1000px) {
+    .container {
+        padding: 1rem 0rem;
+    }
+}
+
+@media (max-width: 765px) {
+    .custom-heading {
+        font-size: 1.5rem;
+    }
+
+    button {
+        font-size: 1rem;
+        margin-right: 10px;
+    }
+
+    .form-control {
+        width: 90%;
+    }
+
+    .school-campaign {
+        width: 90%;
+    }
+
+    .signup-text {
+        font-size: 0.8rem;
+        width: 50%;
+    }
+
+    .join-icon-placeholder {
+        margin-right: 0px;
+    }
+    .campaign-detail{
+        width: 60%;
+    }
+}
+
 </style>
+
